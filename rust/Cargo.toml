@@ -1,0 +1,3 @@
+[workspace]
+members = ["pooled-core", "pooled-native"]
+resolver = "2"

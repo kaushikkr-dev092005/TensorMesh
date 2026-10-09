@@ -1,0 +1,39 @@
+{
+  "name": "tensormesh-runtime",
+  "version": "1.0.0",
+  "description": "Peer-to-peer LLM inference in the browser: each device holds some of the layers, tabs talk over WebRTC, and our own WebGPU kernels do the math.",
+  "license": "MIT",
+  "author": "Nehanth Narendrula",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "test": "deno test --allow-read tests/unit",
+    "check": "deno check engine/*.js && for f in tests/*.js benchmarks/*.js room.js room/*.js harness/*.js site/js/*.js engine/wgsl/*.js cli/bin/*.js cli/lib/*.js cli/test/*.mjs tests/e2e/serve.mjs tests/e2e/serve_record.mjs tests/e2e/serve_v2_smoke.mjs tests/e2e/serve_responses.mjs tests/e2e/serve_messages.mjs tests/e2e/agents/*.mjs; do node --check \"$f\" || exit 1; done",
+    "test:gpu": "tests/run.sh quick",
+    "test:q38": "tests/run.sh q38",
+    "test:q38once": "tests/run.sh q38once",
+    "test:cache": "deno test --allow-read --allow-write tests/unit/weight_cache_test.js",
+    "test:all": "tests/run.sh all",
+    "test:runsh": "tests/run.sh selftest",
+    "bench": "deno run --unstable-webgpu --allow-read --allow-env benchmarks/bench.js",
+    "bench:q38": "MODEL=q38 deno run --unstable-webgpu --allow-read --allow-env --allow-write=${WEIGHT_CACHE:-$HOME/.cache/swarmllm-weights} benchmarks/bench.js",
+    "bench:breakdown": "deno run --unstable-webgpu --allow-read --allow-env benchmarks/bench_breakdown.js",
+    "serve": "npx -y serve -l 8080 .",
+    "e2e": "node tests/e2e/room.mjs",
+    "e2e:code": "node tests/e2e/harness_tetris.mjs",
+    "test:e2e:preview": "node tests/e2e/preview_browser.mjs",
+    "signal:tensormesh": "node scripts/tensormesh-signal.mjs",
+    "test:invite": "node --test --test-isolation=none tests/tensormesh_invite_test.mjs",
+    "test:invite:signal": "node tests/tensormesh_signal_flow.mjs",
+    "e2e:invite": "node tests/e2e/tensormesh_invite.mjs",
+    "start:local": "node scripts/start-local.mjs",
+    "test:standalone": "node --test --test-isolation=none tests/standalone_test.mjs"
+  },
+  "engines": {
+    "deno": ">=2.0"
+  },
+  "devDependencies": {
+    "peer": "^1.0.2",
+    "playwright": "1.49.1"
+  }
+}

@@ -1,0 +1,40 @@
+# model weights & local data (downloaded, never committed)
+engine/model/
+engine/qwen/
+engine/qwen17/
+engine/q38/
+*.gguf
+*.mov
+*.mp4
+*.ips
+# local tooling
+.vercel/
+.gstack/
+node_modules/
+local-server/
+models/
+presentation/
+.claude/
+
+# eval suite output
+tests/eval/results/
+
+# TensorMesh build outputs and local credentials
+**/target/
+**/dist/
+tensormesh/public/runtime/
+*.tsbuildinfo
+.env
+.env.*
+!.env.example
+
+# Local artifacts and credentials
+*.exe
+*.msi
+*.pdb
+*.log
+*.pem
+*.key
+*.p12
+*.pfx
+.DS_Store

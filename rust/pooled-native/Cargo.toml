@@ -1,0 +1,11 @@
+[package]
+name = "pooled-native"
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+description = "Native wgpu parity harness for Pooled's browser WGSL"
+
+[dependencies]
+futures-executor = "0.3.34"
+wgpu = "0.20.1"
+pooled-core = { path = "../pooled-core" }

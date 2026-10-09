@@ -1,0 +1,13 @@
+import { readFile, stat, access } from 'node:fs/promises';
+import path from 'node:path';
+import ts from 'typescript';
+const root=path.resolve('dist'), runtime=path.join(root,'runtime');
+const failures=[], optional=[]; const visited=new Set();
+async function localAsset(ref,base){if(!ref||/^(?:https?:|data:|blob:|#)/.test(ref))return;const clean=ref.split(/[?#]/)[0];const target=clean.startsWith('/')?path.join(root,clean):path.resolve(path.dirname(base),clean);try{if(!(await stat(target)).isFile())throw new Error('not a file')}catch(error){failures.push({ref,base:path.relative(root,base),error:String(error)})}}
+for(const htmlName of ['index.html','runtime/p2p.html']){const file=path.join(root,htmlName),html=await readFile(file,'utf8');for(const m of html.matchAll(/<(?:script|link)\b[^>]*\b(?:src|href)="([^"]+)"/g))await localAsset(m[1],file)}
+for(const cssName of ['assets/app.css','runtime/site/css/fonts.css']){const file=path.join(root,cssName),css=await readFile(file,'utf8');for(const m of css.matchAll(/url\(['"]?([^)'"\s]+)['"]?\)/g))await localAsset(m[1],file)}
+const manifest=JSON.parse(await readFile(path.join(runtime,'site.webmanifest'),'utf8'));for(const icon of manifest.icons)await localAsset(icon.src,path.join(runtime,'site.webmanifest'));
+async function walk(file){if(visited.has(file))return;visited.add(file);const source=await readFile(file,'utf8'),ast=ts.createSourceFile(file,source,ts.ScriptTarget.Latest,true,ts.ScriptKind.JS);const imports=[];function visit(n){if((ts.isImportDeclaration(n)||ts.isExportDeclaration(n))&&n.moduleSpecifier&&ts.isStringLiteral(n.moduleSpecifier))imports.push([n.moduleSpecifier.text,'static']);if(ts.isCallExpression(n)&&n.expression.kind===ts.SyntaxKind.ImportKeyword&&ts.isStringLiteral(n.arguments[0]))imports.push([n.arguments[0].text,'dynamic']);ts.forEachChild(n,visit)}visit(ast);for(const [specifier,type]of imports){if(!specifier.startsWith('.'))continue;const target=path.resolve(path.dirname(file),specifier);try{await access(target)}catch(error){const record={file:path.relative(runtime,file),specifier,type};if(type==='dynamic'&&record.file===path.join('room','code.js')&&['../tests/eval/tasks/index.js','../tests/eval/suite.js'].includes(specifier)){optional.push({...record,note:'Development-only eval suite intentionally not deployed; that optional mode is NOT VERIFIED'});continue;}failures.push(record);continue;}await walk(target)}}
+await walk(path.join(runtime,'room.js'));
+console.log(JSON.stringify({checkedModuleFiles:visited.size,optionalMissingImports:optional,failures},null,2));
+if(failures.length)process.exitCode=1;

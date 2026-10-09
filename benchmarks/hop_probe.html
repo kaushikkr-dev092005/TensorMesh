@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Pooled · GPU and WebRTC hop probe</title>
+  <style>
+    :root { font: 15px/1.5 system-ui, sans-serif; color: #14161d; background: #f6f5f1; }
+    * { box-sizing: border-box; }
+    body { margin: 0 auto; padding: 24px; max-width: 900px; }
+    h1 { margin: 0 0 8px; font-size: 1.65rem; }
+    h2 { margin: 24px 0 8px; font-size: 1.1rem; }
+    p { margin: 6px 0 12px; }
+    button, select { font: inherit; padding: 7px 11px; margin: 3px 5px 3px 0; }
+    button { border: 1px solid #b9c6ff; border-radius: 6px; background: #eaedfe; cursor: pointer; }
+    button:disabled { opacity: .5; cursor: default; }
+    textarea { width: 100%; min-height: 100px; margin: 4px 0 8px; padding: 8px; font: 12px/1.4 ui-monospace, monospace; resize: vertical; }
+    pre { padding: 12px; overflow: auto; background: white; border: 1px solid #e4e2da; border-radius: 6px; white-space: pre-wrap; }
+    .muted { color: #5e616b; }
+  </style>
+</head>
+<body>
+  <h1>GPU and WebRTC hop probe</h1>
+  <p>Measures the hidden-state path used by Pooled: GPU readback, CPU f16 packing, production frame slicing over an RTCDataChannel, CPU unpacking, and GPU upload. Run on localhost or HTTPS. No model weights or prompts are used.</p>
+  <h2>Connect</h2>
+  <p><button id="loopback">Local loopback</button> runs both ends in this browser. To test two devices on a LAN, open this page on both. On device A create an offer and copy the output to device B. On B paste it, accept the offer, and copy its answer to A. On A paste the answer and set it.</p>
+  <button id="offer">A: create offer</button>
+  <button id="accept">B: accept pasted offer</button>
+  <button id="answer">A: set pasted answer</button>
+  <label for="signalOut">Copy this to the other device</label>
+  <textarea id="signalOut" readonly></textarea>
+  <label for="signalIn">Paste signal from the other device</label>
+  <textarea id="signalIn"></textarea>
+  <h2>Measure</h2>
+  <label for="size">f16 activation size</label>
+  <select id="size"><option value="10240">10 KB decode</option><option value="51200">50 KB verify</option></select>
+  <button id="gpu">GPU readback only</button>
+  <button id="hop" disabled>20 full hops</button>
+  <p id="status" role="status" class="muted">Disconnected.</p>
+  <pre id="result">No measurements yet.</pre>
+  <script type="module" src="./hop_probe.js"></script>
+</body>
+</html>

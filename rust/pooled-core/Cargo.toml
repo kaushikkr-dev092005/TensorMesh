@@ -1,0 +1,10 @@
+[package]
+name = "pooled-core"
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+description = "Static execution and placement planning for Pooled"
+
+[lib]
+name = "pooled_core"
+path = "src/lib.rs"

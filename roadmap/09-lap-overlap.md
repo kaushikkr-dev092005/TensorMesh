@@ -1,0 +1,17 @@
+# 09 · Overlapping laps across the network
+
+**Phase:** speed · **Status:** research · per-hop telemetry, its blocker, has landed
+
+## Why
+Cross-network decode pays one round trip per lap while every device waits. Speculation already carries up to 16 tokens per lap; the next step is keeping the pipeline full: start verifying the next draft chain before the current verdict returns, and cancel it if the verdict rejects (PipeInfer reports up to 2.15× on slow interconnects).
+
+## Design sketch
+- The host launches lap N+1 on the assumption that lap N accepts fully; peers need two laps' worth of rollback slots and a versioned cancel message.
+- Gate on data: the room already reports measured tokens per second per draft depth; build this only if real cross-network rooms show the lap is round-trip-bound.
+
+## Done when
+- Cross-internet decode improves measurably on a real two-network room without changing output.
+
+## Update (Sep 2026 research round)
+
+Design and expected-gain model in [docs/archive/research/network-scheduler.md](../docs/archive/research/network-scheduler.md) SS3: 1.29-1.52x at 100 ms RTT with K=3 and two laps in flight. Per-hop telemetry (roadmap 25), which this was waiting on, has landed.
